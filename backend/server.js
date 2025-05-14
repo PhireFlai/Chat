@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
-
 const dotenv = require('dotenv');
+const userRoutes = require("./routes/userRoutes")
+
 
 dotenv.config();
 
@@ -29,6 +30,10 @@ app.get('/api/test', async (req, res) => {
     res.status(500).json({ message: 'Something went wrong' });
   }
 });
+
+app.use('/api/users', userRoutes);
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
