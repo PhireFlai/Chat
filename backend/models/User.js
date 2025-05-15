@@ -1,6 +1,9 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db');
+const { sequelize } = require('./db');
 const Follow = require('./Follow');
+const Chat = require('./Chat');
+const Message = require('./Message')
+const ChatUser = require("./ChatUser")
 
 const User = sequelize.define('User', {
     id: {
@@ -23,25 +26,31 @@ User.belongsToMany(User, {
     as: 'Followers',
     through: Follow,
     foreignKey: 'userId',
-    otherKey: 'followingId'
+    otherKey: 'followingId',
 });
 
 User.belongsToMany(User, {
     as: 'Following',
     through: Follow,
     foreignKey: 'followingId',
-    otherKey: 'userId'
+    otherKey: 'userId',
 });
 
 User.hasMany(Message, {
     as: "sentMessages",
-    foreignKey: 'senderId'
+    foreignKey: 'senderId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
 })
 
-User.hasMany(Message, {
-    as: "recievedMessages",
-    foreignKey: 'receiverId'
-})
+User.belongsToMany(Chat, {
+    as: "Chat",
+    through: ChatUser,
+    foreignKey: 'userId',
+    otherKey: "chatId",
+}
+)
+
 
 
 module.exports = User;

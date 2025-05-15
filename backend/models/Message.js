@@ -1,8 +1,9 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db');
-const User = require('./User');
+const { sequelize } = require('./db');
 
-const message = sequelize.define('Message', {
+
+
+const Message = sequelize.define('Message', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -13,17 +14,25 @@ const message = sequelize.define('Message', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    senderId: {
+    chatId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
         references: {
-            model: "User",
-            key: "id",
-        }
+            model: 'Chats', 
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
     },
-    recieverId: {
+    senderId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
         references: {
-            model: "User",
-            key: "id",
-        }
+            model: 'Users',
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
     },
     createdAt: {
         type: DataTypes.DATE,
@@ -36,6 +45,8 @@ const message = sequelize.define('Message', {
         defaultValue: DataTypes.NOW
     }
 });
+
+
 
 
 module.exports = Message;

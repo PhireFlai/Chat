@@ -16,10 +16,10 @@ const Follow = sequelize.define('Follow', {
             onUpdate: 'CASCADE'
         }
     },
-    followingId: {
+    chatId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'User',
+            model: 'Chat',
             key: 'id',
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE'
