@@ -33,5 +33,16 @@ User.belongsToMany(User, {
     otherKey: 'userId'
 });
 
+User.hasMany(Message, {
+    as: "sentMessages",
+    foreignKey: 'senderId'
+})
+
+User.hasMany(Message, {
+    as: "recievedMessages",
+    foreignKey: 'receiverId'
+})
+
+
 module.exports = User;
 
