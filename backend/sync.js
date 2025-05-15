@@ -7,7 +7,7 @@ const Follow = require('./models/Follow');
     await sequelize.authenticate();
     console.log('Database connection successful.');
 
-    // await sequelize.sync({ force: true }); // WARNING: This will drop and recreate tables
+    await sequelize.sync({ force: true }); // WARNING: This will drop and recreate tables
     console.log('Database synchronized successfully.');
   } catch (error) {
     console.error('Error synchronizing database:', error);
