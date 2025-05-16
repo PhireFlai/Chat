@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const userRoutes = require("./routes/userRoutes")
 const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes')
 const authenticate = require('./middleware/auth');
 
 const User = require('./models/User')
@@ -46,7 +47,10 @@ app.get('/api/test', async (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+
 app.use('/api/users', authenticate, userRoutes);
+
+app.use('/api/chat', authenticate, chatRoutes);
 
 
 
