@@ -1,7 +1,8 @@
 // models/Chat.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('./db');
-
+const User = require("./User")
+const ChatUser = require('./ChatUser')
 
 const Chat = sequelize.define('Chat', {
     id: {
@@ -28,5 +29,7 @@ const Chat = sequelize.define('Chat', {
         defaultValue: DataTypes.NOW
     }
 });
+
+
 
 module.exports = Chat;

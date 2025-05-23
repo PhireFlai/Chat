@@ -2,12 +2,39 @@ const express = require('express')
 const router = express.Router()
 const Chat = require("../models/Chat")
 const User = require('../models/User')
-const Message = require('../models/Message')
 
 
 router.post('/create', async (req, res) => {
     try {
         const { name, type, members } = req.body;
+
+
+        // Check for DM
+        if (type === 'private' && members.length === 2) {
+            const [user1, user2] = members.slice().sort((a, b) => a - b);
+            const chatName = `direct_${user1}_${user2}`;
+
+            // Check if it already exists
+            const existingChat = await Chat.findOne({
+                where: {
+                    name: chatName,
+                    type: 'private'
+                },
+                include: [{
+                    model: User,
+                    as: 'Users',
+                    where: { id: [user1, user2] }
+                }]
+            });
+
+            if (existingChat) {
+                return res.status(200).json({
+                    message: 'Chat already exists',
+                    chat: existingChat
+                });
+            }
+        }
+
         const chat = Chat.create({
             name,
             type,
