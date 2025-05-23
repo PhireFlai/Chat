@@ -1,6 +1,6 @@
 const fs = require('fs'), path = require('path');
 const { Sequelize, DataTypes } = require('sequelize');
-require('dotenv').config();
+const dotenv = require('dotenv');
 
 
 const sequelize = new Sequelize(

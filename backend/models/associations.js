@@ -11,15 +11,18 @@ const defineAssociations = () => {
         as: 'Followers',
         through: Follow,
         foreignKey: 'followingId',
-        otherKey: 'userId'
+        otherKey: 'followerId'
     });
 
     User.belongsToMany(User, {
         as: 'Following',
         through: Follow,
-        foreignKey: 'userId',
+        foreignKey: 'followerId',
         otherKey: 'followingId'
     });
+
+
+
 
     User.hasMany(Message, {
         as: "sentMessages",

@@ -47,26 +47,30 @@ router.post('/:userId/follow/:otherId', async (req, res) => {
             where: { id: actorId },
             attributes: ['id', 'username']
         });
+
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
+
         const other = await User.findOne({
             where: { id: objectId },
             attributes: ['id', 'username']
         });
+
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
 
         const follow = await Follow.create({
-            userId: user.id,
-            otherId: other.id
+            followerId: user.id,
+            followingId: other.id
         })
+        console.log(follow)
 
         res.status(201).json(follow);
     } catch (error) {
         console.log("error following user: ", error);
-        res.status(500).json({ message: "Failed to follow user" })
+        res.status(500).json({ message: "Failed to follow user", error })
     }
 
 })
@@ -77,11 +81,7 @@ router.get("/:id/followed", async (req, res) => {
         const user = await User.findOne({
             where: { id: userId },
             include: [{
-                as: 'Following',
-                model: User,
-                attributes: ["id", "username"],
-                required: false
-
+                association: 'Following',
             }]
         }
         )
@@ -89,12 +89,11 @@ router.get("/:id/followed", async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        const followedUsers = user.Following;
 
-        res.json(followedUsers)
+        res.status(200).json(user.Following); 
     } catch (error) {
         console.error("Error fetching followed Users", error);
-        res.status(500).json({ message: "failed to fetch followed users" })
+        res.status(500).json({ message: "failed to fetch followed users", error })
     }
 });
 

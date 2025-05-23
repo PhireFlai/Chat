@@ -7,23 +7,13 @@ const Follow = sequelize.define('Follow', {
         primaryKey: true,
         autoIncrement: true
     },
-    userId: {
+    followerId: {
         type: DataTypes.INTEGER,
-        references: {
-            model: 'User',
-            key: 'id',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        }
+        allowNull: false
     },
     followingId: {
         type: DataTypes.INTEGER,
-        references: {
-            model: 'User',
-            key: 'id',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        }
+        allowNull: false
     }
 });
 
