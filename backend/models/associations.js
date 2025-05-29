@@ -27,7 +27,7 @@ const defineAssociations = () => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
     })
-    
+
     Message.belongsTo(User, {
         as: "sender",
         foreignKey: 'senderId'
@@ -50,6 +50,14 @@ const defineAssociations = () => {
         as: "chat",
         foreignKey: 'chatId'
     });
+
+    Chat.hasMany(Message, {
+        as: "messages",         
+        foreignKey: 'chatId',    
+        onDelete: 'CASCADE',      
+        onUpdate: 'CASCADE'      
+    });
+
 };
 
 module.exports = defineAssociations;
