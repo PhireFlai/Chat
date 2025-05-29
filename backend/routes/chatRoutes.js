@@ -23,7 +23,9 @@ router.post('/create', async (req, res) => {
                 include: [{
                     model: User,
                     as: 'Users',
-                    where: { id: [user1, user2] }
+                    where: { id: [user1, user2] },
+                    through: { attributes: [] }
+
                 }]
             });
 
@@ -33,28 +35,46 @@ router.post('/create', async (req, res) => {
                     chat: existingChat
                 });
             }
+
+            // Create new chat
+            const chat = await Chat.create({
+                name: chatName,
+                type: 'private'
+            });
+
+            const users = await User.findAll({ where: { id: [user1, user2] } });
+            await chat.addUsers(users);
+
+            return res.status(201).json({
+                message: 'Chat created',
+                chat
+            });
+        } else {
+
+            const chat = Chat.create({
+                name,
+                type,
+            })
+
+            const users = await User.findAll({
+                where: { id: members }
+            })
+
+            if (users.length === 0) {
+                return res.status(404).json({ message: 'No users found' });
+            }
+
+            await Promise.all(
+                users.map(user => chat.addUser(user))
+            );
+
+
+
+            return res.status(201).json({
+                message: 'Chat created',
+                chat
+            });
         }
-
-        const chat = Chat.create({
-            name,
-            type,
-        })
-
-        const users = await User.findAll({
-            where: { id: members }
-        })
-
-        if (users.length === 0) {
-            return res.status(404).json({ message: 'No users found' });
-        }
-
-        await Promise.all(
-            users.map(user => chat.addUser(user))
-        );
-
-
-
-        res.status(200).json({ message: 'Users added to chat successfully' });
     } catch (error) {
         console.log("Error creating Chat:", error);
         res.status(500).json({ message: "Failed to create Chat" })
@@ -63,14 +83,24 @@ router.post('/create', async (req, res) => {
 })
 
 
-// router.get('/:id', async (req, res) => {
-//     try {
-//         const { id } = req.params; // Chat ID
-
-//     }
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params; // Chat ID
 
 
-// })
+        const chat = await Chat.findByPk(id);
+
+        if (!chat) {
+            res.status(404).json({ message: "Chat not found!" })
+        }
+
+        res.status(200).json(chat);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to find Chat" })
+    }
+
+
+})
 
 router.post('/:id/add-users', async (req, res) => {
     try {

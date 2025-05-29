@@ -21,9 +21,6 @@ const defineAssociations = () => {
         otherKey: 'followingId'
     });
 
-
-
-
     User.hasMany(Message, {
         as: "sentMessages",
         foreignKey: 'senderId',

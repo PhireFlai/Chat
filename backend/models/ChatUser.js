@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('./db');
 
-const ChatUser = sequelize.define('Follow', {
+const ChatUser = sequelize.define('ChatUser', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -9,21 +9,12 @@ const ChatUser = sequelize.define('Follow', {
     },
     userId: {
         type: DataTypes.INTEGER,
-        references: {
-            model: 'User',
-            key: 'id',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        }
+        allowNull: false
     },
     chatId: {
         type: DataTypes.INTEGER,
-        references: {
-            model: 'Chat',
-            key: 'id',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        }
+        allowNull: false
+
     }
 });
 

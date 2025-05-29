@@ -43,7 +43,7 @@ const PORT = process.env.PORT || 5000;
     await sequelize.sync({ force: true }); // or { alter: true } or { force: true }
     console.log('Models synced.');
     
-    defineAssociations();
+    await defineAssociations();
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
