@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Chat = require("../models/Chat")
 const User = require('../models/User')
-
+const Message = require("../models/Message")
 
 router.post('/create', async (req, res) => {
     try {
@@ -85,7 +85,7 @@ router.post('/create', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try {
-        const { id } = req.params; // Chat ID
+        const { id } = req.params
 
 
         const chat = await Chat.findByPk(id);
@@ -104,7 +104,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/:id/add-users', async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params
         const { userIds } = req.body;
 
         const chat = await Chat.findByPk(id);
@@ -129,12 +129,80 @@ router.post('/:id/add-users', async (req, res) => {
     }
 });
 
-// router.get('/:id/messages')
+router.get('/:id/messages', async (req, res) => {
+    try {
+        const { id } = req.params
+        const chat = await Chat.findByPk(id, {
+            include: [{
+                model: Message,
+                as: 'messages',
+                order: [['createdAt', 'ASC']]
+            }]
+        });
+
+        res.status(200).json(chat.messages);
+
+    } catch (error) {
+        console.error("Error getting messages from chat:", error);
+        res.status(500).json({ message: "Failed to get messages " })
+    }
+})
 
 
-// router.post('/:id/message')
+router.post('/:id/message', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { userId, content } = req.body;
 
 
-// router.get('/:id/messages/:messageId')
+        const chat = await Chat.findByPk(id);
+        if (!chat) {
+            return res.status(404).json({ message: "Chat not found" });
+        }
+
+        // Optionally, check if user exists
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const message = await Message.create({
+            content,
+            chatId: id,
+            senderId: userId
+        });
+        
+        res.status(201).json(message);
+
+    } catch (error) {
+        res.status(500).json({ message: "Failed to send message" })
+    }
+
+})
+
+
+router.get('/:id/messages/:messageId', async (req, res) => {
+    try {
+        const { id, messageId } = req.params;
+
+        const message = await Message.findOne({
+            where: {
+                id: messageId,
+                chatId: id
+            }
+        });
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found in this chat" });
+        }
+
+        res.status(200).json(message);
+
+    } catch (error) {
+        console.error("Error getting message from chat:", error);
+        res.status(500).json({ message: "Failed to get messages " })
+    }
+})
+
 
 module.exports = router

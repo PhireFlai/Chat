@@ -27,13 +27,16 @@ const defineAssociations = () => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
     })
+    
+    Message.belongsTo(User, {
+        as: "sender",
+        foreignKey: 'senderId'
+    });
 
     User.belongsToMany(Chat, {
         through: ChatUser,
         as: 'Chats',
         foreignKey: 'userId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
     });
 
 
@@ -41,8 +44,11 @@ const defineAssociations = () => {
         through: ChatUser,
         as: 'Users',
         foreignKey: 'chatId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+    });
+
+    Message.belongsTo(Chat, {
+        as: "chat",
+        foreignKey: 'chatId'
     });
 };
 
