@@ -86,12 +86,19 @@ router.post('/create', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params
+        const userId = req.user.userId; // set by your authenticate middleware
 
 
-        const chat = await Chat.findByPk(id);
+        const chat = await Chat.findByPk(id, {
+            include: [{
+                model: User,
+                as: 'Users',
+                where: { id: userId }
+            }]
+        });
 
         if (!chat) {
-            res.status(404).json({ message: "Chat not found!" })
+            res.status(403).json({ message: "You are not a member of this chat!" })
         }
 
         res.status(200).json(chat);
@@ -106,8 +113,17 @@ router.post('/:id/add-users', async (req, res) => {
     try {
         const { id } = req.params
         const { userIds } = req.body;
+        const userId = req.user.userId;
 
-        const chat = await Chat.findByPk(id);
+        const chat = await Chat.findByPk(id, {
+            include: [{
+                model: User,
+                as: 'Users',
+                where: { id: userId }
+            }]
+        });
+
+
         if (!chat) {
             return res.status(404).json({ message: 'Chat not found' });
         }
@@ -132,15 +148,27 @@ router.post('/:id/add-users', async (req, res) => {
 router.get('/:id/messages', async (req, res) => {
     try {
         const { id } = req.params
+        const userId = req.user.userId;
+
         const chat = await Chat.findByPk(id, {
             include: [{
-                model: Message,
-                as: 'messages',
-                order: [['createdAt', 'ASC']]
+                model: User,
+                as: 'Users',
+                where: { id: userId }
             }]
         });
 
-        res.status(200).json(chat.messages);
+        if (!chat) {
+            return res.status(403).json({ message: "You are not a member of this chat!" });
+        }
+
+        const messages = await Message.findAll({
+            where: { chatId: id },
+            order: [['createdAt', 'ASC']]
+        });
+
+
+        res.status(200).json(messages);
 
     } catch (error) {
         console.error("Error getting messages from chat:", error);
@@ -152,26 +180,29 @@ router.get('/:id/messages', async (req, res) => {
 router.post('/:id/message', async (req, res) => {
     try {
         const { id } = req.params;
-        const { userId, content } = req.body;
+        const { content } = req.body;
+        const userId = req.user.userId; // set by your authenticate middleware
 
 
-        const chat = await Chat.findByPk(id);
+        const chat = await Chat.findByPk(id, {
+            include: [{
+                model: User,
+                as: 'Users',
+                where: { id: userId }
+            }]
+        });
+
         if (!chat) {
-            return res.status(404).json({ message: "Chat not found" });
+            return res.status(403).json({ message: "You are not a member of this chat" });
         }
 
-        // Optionally, check if user exists
-        const user = await User.findByPk(userId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
 
         const message = await Message.create({
             content,
             chatId: id,
             senderId: userId
         });
-        
+
         res.status(201).json(message);
 
     } catch (error) {
