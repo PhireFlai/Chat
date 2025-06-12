@@ -51,24 +51,21 @@ router.post('/create', async (req, res) => {
             });
         } else {
 
-            const chat = Chat.create({
+            const chat = await Chat.create({
                 name,
                 type,
-            })
+            });
 
             const users = await User.findAll({
                 where: { id: members }
-            })
+            });
 
             if (users.length === 0) {
                 return res.status(404).json({ message: 'No users found' });
             }
 
-            await Promise.all(
-                users.map(user => chat.addUser(user))
-            );
-
-
+            // Add all users at once
+            await chat.addUsers(users);
 
             return res.status(201).json({
                 message: 'Chat created',
@@ -133,10 +130,8 @@ router.post('/:id/add-users', async (req, res) => {
             return res.status(404).json({ message: 'No users found' });
         }
 
-        // Add users to the chat
-        await Promise.all(
-            users.map(user => chat.addUser(user)) // Sequelize association method
-        );
+
+        await chat.addUsers(users);
 
         res.status(200).json({ message: 'Users added to chat successfully' });
     } catch (error) {
