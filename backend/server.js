@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticate, userRoutes);
-app.use('/api/chat', authenticate, chatRoutes);
+app.use('/api/chats', authenticate, chatRoutes);
 
 // Start server only after DB is connected
 const PORT = process.env.PORT || 5000;

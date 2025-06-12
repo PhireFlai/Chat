@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const Follow = require('../models/Follow');
+const Chat = require('../models/Chat');
 
 
 
@@ -90,12 +91,37 @@ router.get("/:id/followed", async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.status(200).json(user.Following); 
+        res.status(200).json(user.Following);
     } catch (error) {
-        console.error("Error fetching followed Users", error);
+        console.error("Error fetching followed Users ", error);
         res.status(500).json({ message: "failed to fetch followed users", error })
     }
 });
+
+router.get("/:id/chats", async (req, res) => {
+    try {
+        const userId = req.params.id
+        const user = await User.findOne({
+            where: { id: userId },
+            include: [{
+                association: 'Chats',
+                attributes: ['id', 'name', 'type', 'createdAt', 'updatedAt']
+
+            }]
+        })
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+
+        res.status(200).json(user.Chats);
+
+    } catch (error) {
+        console.error("Error fetching chat for user ", error)
+        res.status(500).json({ message: "failed to fetch user chats" })
+    }
+})
 
 
 module.exports = router;
