@@ -238,7 +238,7 @@ router.get('/:id/messages/:messageId', async (req, res) => {
 router.post('/:id/rename', async (req, res) => {
     try {
         const { id } = req.params;
-        const {newName} = req.body;
+        const { newName } = req.body;
 
         const chat = await Chat.findByPk(id, {
         });
