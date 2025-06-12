@@ -181,7 +181,7 @@ router.post('/:id/message', async (req, res) => {
     try {
         const { id } = req.params;
         const { content } = req.body;
-        const userId = req.user.userId; // set by your authenticate middleware
+        const userId = req.user.userId;
 
 
         const chat = await Chat.findByPk(id, {
@@ -235,5 +235,25 @@ router.get('/:id/messages/:messageId', async (req, res) => {
     }
 })
 
+router.post('/:id/rename', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {newName} = req.body;
+
+        const chat = await Chat.findByPk(id, {
+        });
+
+        if (!chat) {
+            return res.status(404).json({ message: "Chat not Found" });
+        }
+        chat.name = newName;
+
+        await chat.save();
+        res.status(200).json(chat);
+
+    } catch (error) {
+        console.log("Failed to rename chatname", error)
+    }
+})
 
 module.exports = router
