@@ -159,7 +159,11 @@ router.get('/:id/messages', async (req, res) => {
 
         const messages = await Message.findAll({
             where: { chatId: id },
-            order: [['createdAt', 'ASC']]
+            order: [['createdAt', 'ASC']],
+            include: [{
+                model: User,
+                as: 'sender',
+            }]
         });
 
 
