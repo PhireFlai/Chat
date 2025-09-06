@@ -28,6 +28,9 @@ services:
       - db
     networks:
       - app_network
+    volumes:
+      - ./backend/uploads/images:/app/uploads/images
+
 
   client:
     build: ./frontend

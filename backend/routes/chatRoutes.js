@@ -237,7 +237,7 @@ router.post('/:id/upload', upload.single('image'), async (req, res) => {
 
 
         // Create a message with image URL
-        const newMessage = await Message.create({
+        const message = await Message.create({
             chatId: id,
             senderId: userId,
             type: "image",
@@ -246,9 +246,9 @@ router.post('/:id/upload', upload.single('image'), async (req, res) => {
         });
         
 
-        res.status(201).json({ message: 'image uploaded and message created.', data: newMessage });
+        res.status(201).json(message);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to image video.', error: error.message });
+        res.status(500).json({ message: 'Failed to upload image.', error: error.message });
     }
 });
 
