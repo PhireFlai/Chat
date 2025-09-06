@@ -1,19 +1,33 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
+
+const fs = require('fs');
+const path = require('path')
+
 const { sequelize } = require('./models/db');
 const defineAssociations = require('./models/associations');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const authenticate = require('./middleware/auth');
+
 const http = require('http')
 const { Server } = require('socket.io')
+
+const PATH = 'uploads/images/';
+if (!fs.existsSync(PATH)) {
+  fs.mkdirSync(PATH, { recursive: true });
+}
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost'],
@@ -49,6 +63,8 @@ io.on('connection', (socket) => {
 })
 
 
+// Image serving
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Routes

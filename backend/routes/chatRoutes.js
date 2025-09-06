@@ -1,8 +1,41 @@
 const express = require('express')
+const multer = require('multer')
+const path = require('path');
+
 const router = express.Router()
 const Chat = require("../models/Chat")
 const User = require('../models/User')
 const Message = require("../models/Message")
+
+const PATH = 'uploads/images/'
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, PATH);
+    },
+    filename: function (req, file, cb) {
+        // Use unique filename: chatId-timestamp-originalname
+        const chatId = req.params.id;
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, `chat${chatId}-${uniqueSuffix}${path.extname(file.originalname)}`);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only images are allowed!'), false);
+    }
+};
+
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
+});
+
+
 
 router.post('/create', async (req, res) => {
     try {
@@ -175,6 +208,49 @@ router.get('/:id/messages', async (req, res) => {
     }
 })
 
+
+router.post('/:id/upload', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded.' });
+        }
+
+        const { id } = req.params;
+        // const formData = req.body;
+        const userId = req.user.userId;
+
+        console.log(req.file)
+
+
+
+        const chat = await Chat.findByPk(id, {
+            include: [{
+                model: User,
+                as: 'Users',
+                where: { id: userId }
+            }]
+        });
+
+        if (!chat) {
+            return res.status(403).json({ message: "You are not a member of this chat" });
+        }
+
+
+        // Create a message with image URL
+        const newMessage = await Message.create({
+            chatId: id,
+            senderId: userId,
+            type: "image",
+            url: req.file.path,
+            content: `${req.file.filename}`
+        });
+        
+
+        res.status(201).json({ message: 'image uploaded and message created.', data: newMessage });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to image video.', error: error.message });
+    }
+});
 
 router.post('/:id/message', async (req, res) => {
     try {

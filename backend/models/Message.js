@@ -10,6 +10,14 @@ const Message = sequelize.define('Message', {
         autoIncrement: true,
         allowNull: false
     },
+    type: {
+        type: DataTypes.ENUM('text', 'image'),
+        defaultValue: 'text'
+    },
+    url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     content: {
         type: DataTypes.STRING,
         allowNull: false
