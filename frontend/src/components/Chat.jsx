@@ -165,70 +165,62 @@ const Chat = () => {
 
     // display the chat
     return (
-        // maps each message to a message component
-        <div class="h-128 overflow-y-auto" >
-            {messages.map(msg => (
-                <Message
-                    key={msg.id}
-                    type={msg.type}
-                    content={msg.content}
-                    sender={msg.sender.username}
-                    createdAt={msg.createdAt}
-                    updatedAt={msg.updatedAt}
-                    imageUrl={msg.url}
-                />
-            )
+        <div className="flex flex-col h-full">
+            {/* Messages container */}
+            <div className="h-96 flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900">
+                {messages.map((msg) => (
+                    <Message
+                        key={msg.id}
+                        type={msg.type}
+                        content={msg.content}
+                        sender={msg.sender.username}
+                        createdAt={msg.createdAt}
+                        updatedAt={msg.updatedAt}
+                        imageUrl={msg.url}
+                    />
+                ))}
 
-            )}
+                {/* Image preview */}
+                {preview && (
+                    <img
+                        src={preview}
+                        alt="preview"
+                        className="w-32 object-cover rounded shadow"
+                    />
+                )}
+            </div>
 
-
-            {/*  renders a preview item when an image is uploaded */}
-            {preview && (
-                <img
-                    src={preview}
-                    alt="preview"
-                    style={{
-                        width: "120px",
-                        objectFit: 'cover',
-                        boxShadow: '4px'
-                    }}
-                />
-            )}
-
-            {/* handles submissions of images and messags */}
-            <form onSubmit={handleSubmit} style={{ marginTop: 4 }}>
+            {/* Input bar pinned to bottom */}
+            <form
+                onSubmit={handleSubmit}
+                className="flex items-center p-2 border-t bg-white dark:bg-gray-800"
+            >
                 <input
                     type="text"
                     value={input}
-                    onChange={e => setInput(e.target.value)}
+                    onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
-                    style={{ width: '80%' }}
+                    className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-400"
                 />
-                <button type="submit" style={{ marginLeft: 2 }}>Send</button>
-
-                <div>
-                    {/* image upload button TODO change CSS*/}
-                    <label style={{
-                        marginLeft: 8,
-                        background: "#eee",
-                        padding: "4px 8px",
-                        borderRadius: 4,
-                        cursor: "pointer"
-                    }}>
-                        📷
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            style={{ display: "none" }}
-                        />
-                    </label>
-
-                </div>
+                <button
+                    type="submit"
+                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                    Send
+                </button>
+                <label className="ml-2 px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-300">
+                    📷
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                    />
+                </label>
             </form>
+        </div>
+    );
 
-        </div >
-    )
 }
 
 export default Chat;

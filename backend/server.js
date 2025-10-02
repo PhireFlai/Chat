@@ -75,11 +75,34 @@ app.use('/api/chats', authenticate, chatRoutes);
 // Start server only after DB is connected
 const PORT = process.env.PORT || 5000;
 
+
+// retry connection to database if it fails
+const connectDBWithRetry = async (maxRetries = 10, retryInterval = 5000) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Attempting to connect to database (attempt ${attempt}/${maxRetries})...`);
+      await sequelize.authenticate();
+      console.log('Database connected successfully!');
+      return true;
+    } catch (error) {
+      console.error(`Database connection attempt ${attempt} failed:`, error.message);
+      
+      if (attempt === maxRetries) {
+        console.error('Maximum retry attempts reached. Unable to connect to database.');
+        return false;
+      }
+      
+      console.log(`Retrying in ${retryInterval / 1000} seconds...`);
+      await new Promise(resolve => setTimeout(resolve, retryInterval));
+    }
+  }
+};
+
 (async () => {
 
   try {
 
-    await sequelize.authenticate();
+    await connectDBWithRetry();
     console.log('Database connected.');
 
     await sequelize.sync({ alter: true }); // or { alter: true } or { force: true }
